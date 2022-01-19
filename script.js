@@ -55,62 +55,58 @@ fillDrag()
 
 document.addEventListener('mousedown', (e) => {
     let figure = e.target
-    console.log(figure)
     if (e.target.classList == 'dragble') {
-        figure.onmousedown = function(event) {
-            console.log(figure)
-            let shiftX = event.clientX - figure.getBoundingClientRect().left;
-            let shiftY = event.clientY - figure.getBoundingClientRect().top;
+        //let shiftX = event.clientX - figure.getBoundingClientRect().left;
+        //let shiftY = event.clientY - figure.getBoundingClientRect().top;
 
-            figure.style.position = 'absolute';
-            figure.style.zIndex = 1000;
-            document.body.append(figure);
+        figure.style.position = 'absolute';
+        figure.style.zIndex = 1000;
+        document.body.append(figure);
 
+        moveAt(e.pageX, e.pageY);
+
+        // переносит мяч на координаты (pageX, pageY),
+        // дополнительно учитывая изначальный сдвиг относительно указателя мыши
+        function moveAt(pageX, pageY) {
+            figure.style.left = pageX - figure.offsetWidth / 2 + 'px';;
+            figure.style.top = pageY - figure.offsetHeight / 2 + 'px';;
+        }
+
+        function onMouseMove(event) {
             moveAt(event.pageX, event.pageY);
+            if (event.clientX < figure.getBoundingClientRect().left &&
+                event.clientX > figure.getBoundingClientRect().right &&
+                event.clientY < figure.getBoundingClientRect().top &&
+                event.clientY > figure.getBoundingClientRect().bottom
+            ) {
+                figure.style.position = 'static';
+                figure.style.zIndex = 1;
+                drag.append(figure)
+            }
+        }
 
-            // переносит мяч на координаты (pageX, pageY),
-            // дополнительно учитывая изначальный сдвиг относительно указателя мыши
-            function moveAt(pageX, pageY) {
-                figure.style.left = pageX - figure.offsetWidth / 2 + 'px';;
-                figure.style.top = pageY - figure.offsetHeight / 2 + 'px';;
+        // передвигаем мяч при событии mousemove
+        document.addEventListener('mousemove', onMouseMove);
+
+        // отпустить мяч, удалить ненужные обработчики
+        figure.onmouseup = function() {
+
+            document.removeEventListener('mousemove', onMouseMove);
+            if (figure.getBoundingClientRect().left > drop.getBoundingClientRect().left &&
+                figure.getBoundingClientRect().right < drop.getBoundingClientRect().right &&
+                figure.getBoundingClientRect().top > drop.getBoundingClientRect().top &&
+                figure.getBoundingClientRect().bottom < drop.getBoundingClientRect().bottom) {
+                drop.append(figure)
+            } else {
+                figure.style.position = 'static';
+                figure.style.zIndex = 1;
+                drag.append(figure)
             }
 
-            function onMouseMove(event) {
-                moveAt(event.pageX, event.pageY);
-                if (event.clientX < figure.getBoundingClientRect().left &&
-                    event.clientX > figure.getBoundingClientRect().right &&
-                    event.clientY < figure.getBoundingClientRect().top &&
-                    event.clientY > figure.getBoundingClientRect().bottom
-                ) {
-                    figure.style.position = 'static';
-                    figure.style.zIndex = 1;
-                    drag.append(figure)
-                }
-            }
 
-            // передвигаем мяч при событии mousemove
-            document.addEventListener('mousemove', onMouseMove);
-
-            // отпустить мяч, удалить ненужные обработчики
-            figure.onmouseup = function() {
-
-                document.removeEventListener('mousemove', onMouseMove);
-                if (figure.getBoundingClientRect().left > drop.getBoundingClientRect().left &&
-                    figure.getBoundingClientRect().right < drop.getBoundingClientRect().right &&
-                    figure.getBoundingClientRect().top > drop.getBoundingClientRect().top &&
-                    figure.getBoundingClientRect().bottom < drop.getBoundingClientRect().bottom) {
-                    //figure.onmouseup = null;
-                } else {
-                    figure.style.position = 'static';
-                    figure.style.zIndex = 1;
-                    drag.append(figure)
-                }
-
-
-                //figure.onmouseup = null;
-            };
-
+            //figure.onmouseup = null;
         };
+
 
         figure.ondragstart = function() {
             return false;
