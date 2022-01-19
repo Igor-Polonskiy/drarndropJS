@@ -8,33 +8,27 @@ class Figure {
         this.color = color
         this.shape = shape
         this.parent = drag
-
-        console.log(this)
     }
 
     render() {
         const element = document.createElement('div')
 
         element.classList.add('dragble')
-        element.setAttribute('draggable', true)
 
         element.style.width = `${this.width}px`
         element.style.height = `${this.height}px`
         element.style.background = this.color
-
+        element.style.zIndex = '2'
         switch (this.shape) {
 
             case 'circle':
                 element.style.borderRadius = '50%';
-                console.log(this.shape)
                 break;
             case 'square':
                 element.style.borderRadius = '0';
-                console.log(this.shape)
                 break;
             default:
                 element.style.borderRadius = '0';
-                console.log(this.shape)
                 break;
         }
 
@@ -58,40 +52,69 @@ function fillDrag() {
     })
 }
 fillDrag()
-document.addEventListener()
-ball.onmousedown = function(event) {
 
-    let shiftX = event.clientX - ball.getBoundingClientRect().left;
-    let shiftY = event.clientY - ball.getBoundingClientRect().top;
+document.addEventListener('mousedown', (e) => {
+    let figure = e.target
+    console.log(figure)
+    if (e.target.classList == 'dragble') {
+        figure.onmousedown = function(event) {
+            console.log(figure)
+            let shiftX = event.clientX - figure.getBoundingClientRect().left;
+            let shiftY = event.clientY - figure.getBoundingClientRect().top;
 
-    ball.style.position = 'absolute';
-    ball.style.zIndex = 1000;
-    document.body.append(ball);
+            figure.style.position = 'absolute';
+            figure.style.zIndex = 1000;
+            document.body.append(figure);
 
-    moveAt(event.pageX, event.pageY);
+            moveAt(event.pageX, event.pageY);
 
-    // переносит мяч на координаты (pageX, pageY),
-    // дополнительно учитывая изначальный сдвиг относительно указателя мыши
-    function moveAt(pageX, pageY) {
-        ball.style.left = pageX - shiftX + 'px';
-        ball.style.top = pageY - shiftY + 'px';
+            // переносит мяч на координаты (pageX, pageY),
+            // дополнительно учитывая изначальный сдвиг относительно указателя мыши
+            function moveAt(pageX, pageY) {
+                figure.style.left = pageX - figure.offsetWidth / 2 + 'px';;
+                figure.style.top = pageY - figure.offsetHeight / 2 + 'px';;
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX, event.pageY);
+                if (event.clientX < figure.getBoundingClientRect().left &&
+                    event.clientX > figure.getBoundingClientRect().right &&
+                    event.clientY < figure.getBoundingClientRect().top &&
+                    event.clientY > figure.getBoundingClientRect().bottom
+                ) {
+                    figure.style.position = 'static';
+                    figure.style.zIndex = 1;
+                    drag.append(figure)
+                }
+            }
+
+            // передвигаем мяч при событии mousemove
+            document.addEventListener('mousemove', onMouseMove);
+
+            // отпустить мяч, удалить ненужные обработчики
+            figure.onmouseup = function() {
+
+                document.removeEventListener('mousemove', onMouseMove);
+                if (figure.getBoundingClientRect().left > drop.getBoundingClientRect().left &&
+                    figure.getBoundingClientRect().right < drop.getBoundingClientRect().right &&
+                    figure.getBoundingClientRect().top > drop.getBoundingClientRect().top &&
+                    figure.getBoundingClientRect().bottom < drop.getBoundingClientRect().bottom) {
+                    //figure.onmouseup = null;
+                } else {
+                    figure.style.position = 'static';
+                    figure.style.zIndex = 1;
+                    drag.append(figure)
+                }
+
+
+                //figure.onmouseup = null;
+            };
+
+        };
+
+        figure.ondragstart = function() {
+            return false;
+        };
     }
 
-    function onMouseMove(event) {
-        moveAt(event.pageX, event.pageY);
-    }
-
-    // передвигаем мяч при событии mousemove
-    document.addEventListener('mousemove', onMouseMove);
-
-    // отпустить мяч, удалить ненужные обработчики
-    ball.onmouseup = function() {
-        document.removeEventListener('mousemove', onMouseMove);
-        ball.onmouseup = null;
-    };
-
-};
-
-ball.ondragstart = function() {
-    return false;
-};
+})
