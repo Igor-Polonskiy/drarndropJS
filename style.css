@@ -1,0 +1,21 @@
+.drop {
+    width: 80vw;
+    height: 600px;
+    margin: 20px auto;
+    border: 2px solid black;
+    border-radius: 20px;
+}
+
+.drag {
+    width: 80vw;
+    height: 200px;
+    margin: 20px auto;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+}
+
+.dragble {
+    cursor: pointer;
+    margin: 20px;
+}
