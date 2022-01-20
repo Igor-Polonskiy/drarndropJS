@@ -100,12 +100,6 @@ document.addEventListener('mousedown', (e) => {
                 drag.append(figure)
                 countFigures()
             }
-
-            if (drop.children.length) {
-
-            } else {
-
-            }
         };
 
         figure.ondragstart = function() {
