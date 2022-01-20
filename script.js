@@ -1,5 +1,6 @@
 const drag = document.querySelector('.drag')
 const drop = document.querySelector('.drop')
+const text = document.querySelector('h3')
 
 class Figure {
     constructor(color = 'black', shape = 'square', width = 100, height = 100) {
@@ -9,18 +10,15 @@ class Figure {
         this.shape = shape
         this.parent = drag
     }
-
     render() {
         const element = document.createElement('div')
-
         element.classList.add('dragble')
-
         element.style.width = `${this.width}px`
         element.style.height = `${this.height}px`
         element.style.background = this.color
         element.style.zIndex = '2'
-        switch (this.shape) {
 
+        switch (this.shape) {
             case 'circle':
                 element.style.borderRadius = '50%';
                 break;
@@ -31,7 +29,6 @@ class Figure {
                 element.style.borderRadius = '0';
                 break;
         }
-
         this.parent.append(element)
     }
 }
@@ -51,6 +48,7 @@ function fillDrag() {
         new Figure(item.color, item.shape).render()
     })
 }
+
 fillDrag()
 
 document.addEventListener('mousedown', (e) => {
@@ -68,12 +66,21 @@ document.addEventListener('mousedown', (e) => {
         // переносит мяч на координаты (pageX, pageY),
         // дополнительно учитывая изначальный сдвиг относительно указателя мыши
         function moveAt(pageX, pageY) {
+            console.log(figure.offsetWidth / 2)
             figure.style.left = pageX - figure.offsetWidth / 2 + 'px';;
             figure.style.top = pageY - figure.offsetHeight / 2 + 'px';;
         }
 
         function onMouseMove(event) {
             moveAt(event.pageX, event.pageY);
+
+            document.addEventListener('mouseleave', () => {
+                console.log('leave')
+                figure.style.position = 'static';
+                figure.style.zIndex = 1;
+                drag.append(figure)
+            });
+
             if (event.clientX < figure.getBoundingClientRect().left &&
                 event.clientX > figure.getBoundingClientRect().right &&
                 event.clientY < figure.getBoundingClientRect().top &&
@@ -82,6 +89,8 @@ document.addEventListener('mousedown', (e) => {
                 figure.style.position = 'static';
                 figure.style.zIndex = 1;
                 drag.append(figure)
+            } else {
+
             }
         }
 
