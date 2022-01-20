@@ -1,6 +1,6 @@
 const drag = document.querySelector('.drag')
 const drop = document.querySelector('.drop')
-const text = document.querySelector('h3')
+const text = document.querySelector('span')
 
 class Figure {
     constructor(color = 'black', shape = 'square', width = 100, height = 100) {
@@ -41,8 +41,6 @@ let arr = [{
     shape: 'circle'
 }]
 
-//new Figure('green', 'circle').render()
-
 function fillDrag() {
     arr.forEach(item => {
         new Figure(item.color, item.shape).render()
@@ -54,68 +52,61 @@ fillDrag()
 document.addEventListener('mousedown', (e) => {
     let figure = e.target
     if (e.target.classList == 'dragble') {
-        //let shiftX = event.clientX - figure.getBoundingClientRect().left;
-        //let shiftY = event.clientY - figure.getBoundingClientRect().top;
 
         figure.style.position = 'absolute';
         figure.style.zIndex = 1000;
         document.body.append(figure);
 
         moveAt(e.pageX, e.pageY);
+        document.addEventListener('mousemove', onMouseMove);
 
-        // переносит мяч на координаты (pageX, pageY),
-        // дополнительно учитывая изначальный сдвиг относительно указателя мыши
         function moveAt(pageX, pageY) {
-            console.log(figure.offsetWidth / 2)
-            figure.style.left = pageX - figure.offsetWidth / 2 + 'px';;
-            figure.style.top = pageY - figure.offsetHeight / 2 + 'px';;
+
+            figure.style.left = pageX - figure.offsetWidth / 2 - 20 + 'px';;
+            figure.style.top = pageY - figure.offsetHeight / 2 - 20 + 'px';;
+        }
+
+        function countFigures() {
+            text.innerText = `${drop.children.length}`
         }
 
         function onMouseMove(event) {
+
             moveAt(event.pageX, event.pageY);
+            if (figure.getBoundingClientRect().left < 0 || figure.getBoundingClientRect().right > window.innerWidth ||
+                figure.getBoundingClientRect().top < 0 || figure.getBoundingClientRect().bottom > window.innerHeight) {
 
-            document.addEventListener('mouseleave', () => {
-                console.log('leave')
+                document.removeEventListener('mousemove', onMouseMove);
                 figure.style.position = 'static';
                 figure.style.zIndex = 1;
                 drag.append(figure)
-            });
-
-            if (event.clientX < figure.getBoundingClientRect().left &&
-                event.clientX > figure.getBoundingClientRect().right &&
-                event.clientY < figure.getBoundingClientRect().top &&
-                event.clientY > figure.getBoundingClientRect().bottom
-            ) {
-                figure.style.position = 'static';
-                figure.style.zIndex = 1;
-                drag.append(figure)
-            } else {
-
+                countFigures()
             }
         }
 
-        // передвигаем мяч при событии mousemove
-        document.addEventListener('mousemove', onMouseMove);
-
-        // отпустить мяч, удалить ненужные обработчики
         figure.onmouseup = function() {
 
             document.removeEventListener('mousemove', onMouseMove);
+
             if (figure.getBoundingClientRect().left > drop.getBoundingClientRect().left &&
                 figure.getBoundingClientRect().right < drop.getBoundingClientRect().right &&
                 figure.getBoundingClientRect().top > drop.getBoundingClientRect().top &&
                 figure.getBoundingClientRect().bottom < drop.getBoundingClientRect().bottom) {
                 drop.append(figure)
+                countFigures()
             } else {
                 figure.style.position = 'static';
                 figure.style.zIndex = 1;
                 drag.append(figure)
+                countFigures()
             }
 
+            if (drop.children.length) {
 
-            //figure.onmouseup = null;
+            } else {
+
+            }
         };
-
 
         figure.ondragstart = function() {
             return false;

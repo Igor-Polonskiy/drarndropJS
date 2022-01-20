@@ -2,10 +2,15 @@ body {
     overflow: hidden;
 }
 
+h3 {
+    margin: auto 10%;
+    color: rgb(18, 150, 238);
+}
+
 .drop {
     width: 80vw;
     height: 500px;
-    margin: 20px auto;
+    margin: 30px auto;
     border: 2px solid black;
     border-radius: 20px;
 }
